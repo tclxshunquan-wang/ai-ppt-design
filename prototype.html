@@ -1,0 +1,3443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI PPT生成器 - 产品原型图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .prototype-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            border: none;
+            background: #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .tab-button:hover {
+            background: #d0d0d0;
+        }
+
+        .tab-button.active {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .page-content {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        /* Header样式 */
+        .header {
+            height: 60px;
+            background: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4a90e2;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-item {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: #4a90e2;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* 首页样式 */
+        .hero-section {
+            height: 66vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .hero-button {
+            padding: 16px 40px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .hero-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .hero-chat-box {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            margin-top: 30px;
+        }
+
+        .hero-chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .hero-chat-input {
+            flex: 1;
+            padding: 16px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            resize: none;
+            min-height: 56px;
+            max-height: 120px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .hero-chat-input:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+
+        .hero-chat-input::placeholder {
+            color: #999;
+        }
+
+        .hero-chat-send {
+            padding: 16px 32px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .hero-chat-send:hover {
+            background: #357abd;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+        }
+
+        .hero-chat-send:active {
+            transform: translateY(0);
+        }
+
+        .hero-chat-hint {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .hero-chat-shortcuts {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .hero-shortcut-tag {
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .hero-shortcut-tag:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .features-section {
+            padding: 60px 40px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: #f9f9f9;
+            padding: 24px;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: #4a90e2;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .cases-section {
+            padding: 60px 40px;
+            background: #f9f9f9;
+        }
+
+        .cases-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto 30px;
+        }
+
+        .case-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .case-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .case-thumbnail {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+
+        .case-title {
+            padding: 16px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .more-button {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .footer {
+            padding: 40px;
+            text-align: center;
+            color: #999;
+            background: #f9f9f9;
+        }
+
+        /* AI工作台样式 */
+        .workspace-header {
+            height: 60px;
+            background: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .mode-switch {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mode-btn {
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .mode-btn.active {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }
+
+        .workspace-container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .chat-panel {
+            width: 40%;
+            background: #f9f9f9;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .message.ai .message-avatar {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .message.user .message-content {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .message.ai .message-content {
+            background: white;
+            color: #333;
+            border: 1px solid #e0e0e0;
+        }
+
+        .suggestion-box {
+            background: #f0f7ff;
+            border: 1px solid #4a90e2;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 8px;
+        }
+
+        .suggestion-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #4a90e2;
+        }
+
+        .suggestion-content {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .confirm-btn {
+            padding: 6px 16px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .shortcut-tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tag {
+            padding: 6px 12px;
+            background: #f0f0f0;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tag:hover {
+            background: #e0e0e0;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+        }
+
+        .send-btn {
+            padding: 12px 24px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .preview-panel {
+            width: 60%;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px 40px;
+            overflow-y: auto;
+        }
+
+        .selection-hint {
+            width: 100%;
+            max-width: 900px;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #856404;
+            display: none;
+        }
+
+        #workspace.edit-mode-active .selection-hint {
+            display: block;
+        }
+
+        .ppt-canvas {
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 16/9;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .ppt-slide {
+            width: 100%;
+            height: 100%;
+        }
+
+        .ppt-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 24px;
+            color: #333;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .ppt-title:hover {
+            background: rgba(74, 144, 226, 0.1);
+        }
+
+        .ppt-image {
+            display: inline-block;
+            position: relative;
+        }
+
+        .ppt-image.selected-element {
+            border: 2px solid #4a90e2 !important;
+            background: rgba(74, 144, 226, 0.1) !important;
+            padding: 4px;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .ppt-image:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .ppt-content {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #666;
+        }
+
+        .ppt-bullet {
+            margin-bottom: 12px;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .ppt-bullet:hover {
+            background: rgba(74, 144, 226, 0.1);
+        }
+
+        /* 编辑模式下的可点击元素 */
+        .edit-mode .ppt-title,
+        .edit-mode .ppt-bullet,
+        .edit-mode .ppt-image {
+            position: relative;
+            user-select: none;
+        }
+
+        /* 编辑模式提示 */
+        #workspace.edit-mode-active .selection-hint {
+            display: block;
+        }
+
+        /* 圈选状态 */
+        .selected-element {
+            border: 2px solid #4a90e2 !important;
+            background: rgba(74, 144, 226, 0.1) !important;
+            position: relative !important;
+            padding: 8px;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* 图片元素的选中状态 */
+        .ppt-image.selected-element {
+            border: 2px solid #4a90e2 !important;
+            background: rgba(74, 144, 226, 0.1) !important;
+            position: relative !important;
+            padding: 4px;
+            border-radius: 4px;
+            box-sizing: border-box;
+            display: inline-block !important;
+        }
+
+        /* 操作栏 */
+        .selection-toolbar {
+            position: absolute;
+            top: -45px;
+            right: 0;
+            display: flex;
+            gap: 6px;
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            z-index: 10;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toolbar-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: #f5f5f5;
+            font-size: 16px;
+            transition: all 0.2s;
+            border: 1px solid #e0e0e0;
+        }
+
+        .toolbar-icon:hover {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+            transform: scale(1.1);
+        }
+
+        .toolbar-icon.add-to-chat {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }
+
+        .toolbar-icon.add-to-chat:hover {
+            background: #357abd;
+        }
+
+        .toolbar-icon.delete {
+            background: #ff4757;
+            color: white;
+            border-color: #ff4757;
+        }
+
+        .toolbar-icon.delete:hover {
+            background: #ee3742;
+        }
+
+        .toolbar-icon.edit {
+            background: #ffa502;
+            color: white;
+            border-color: #ffa502;
+        }
+
+        .toolbar-icon.edit:hover {
+            background: #ff9500;
+        }
+
+        .toolbar-icon.move {
+            background: #2ed573;
+            color: white;
+            border-color: #2ed573;
+        }
+
+        .toolbar-icon.move:hover {
+            background: #26d467;
+        }
+
+        .toolbar-icon.move.active {
+            background: #1e9e4f;
+            cursor: move;
+        }
+
+        /* 调整点 */
+        .resize-handle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #4a90e2;
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .resize-handle:hover {
+            background: #357abd;
+            transform: scale(1.2);
+        }
+
+        /* 角点 */
+        .resize-handle.nw {
+            top: -6px;
+            left: -6px;
+            cursor: nw-resize;
+        }
+
+        .resize-handle.ne {
+            top: -6px;
+            right: -6px;
+            cursor: ne-resize;
+        }
+
+        .resize-handle.sw {
+            bottom: -6px;
+            left: -6px;
+            cursor: sw-resize;
+        }
+
+        .resize-handle.se {
+            bottom: -6px;
+            right: -6px;
+            cursor: se-resize;
+        }
+
+        /* 边中点 */
+        .resize-handle.n {
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            cursor: n-resize;
+        }
+
+        .resize-handle.s {
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            cursor: s-resize;
+        }
+
+        .resize-handle.w {
+            left: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: w-resize;
+        }
+
+        .resize-handle.e {
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: e-resize;
+        }
+
+        /* 拖拽状态 */
+        .selected-element.dragging {
+            cursor: move;
+            opacity: 0.8;
+        }
+
+        .selected-element.resizing {
+            cursor: nw-resize;
+        }
+
+        /* 多选状态 */
+        .multi-select-mode .ppt-title,
+        .multi-select-mode .ppt-bullet {
+            cursor: crosshair;
+        }
+
+        /* 选中计数提示 */
+        .selection-count {
+            position: absolute;
+            top: -45px;
+            left: 0;
+            background: #4a90e2;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .property-panel {
+            position: fixed;
+            right: 0;
+            top: 60px;
+            width: 300px;
+            height: calc(100vh - 60px);
+            background: white;
+            border-left: 1px solid #e0e0e0;
+            padding: 24px;
+            overflow-y: auto;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .property-panel.collapsed {
+            transform: translateX(100%);
+        }
+
+        .property-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .property-panel-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .property-panel-toggle {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .property-panel-toggle:hover {
+            background: #f5f5f5;
+            border-color: #4a90e2;
+            color: #4a90e2;
+        }
+
+        .property-panel-content {
+            transition: opacity 0.2s;
+        }
+
+        .property-panel.collapsed .property-panel-content {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .content-editor {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .content-text-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .content-text-input:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+        }
+
+        .image-upload-area {
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f9f9f9;
+        }
+
+        .image-upload-area:hover {
+            border-color: #4a90e2;
+            background: #f0f7ff;
+        }
+
+        .image-upload-area.has-image {
+            border: none;
+            padding: 0;
+            background: transparent;
+        }
+
+        .image-upload-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            color: #999;
+        }
+
+        .image-upload-text {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .image-upload-hint {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .image-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .image-action-btn {
+            padding: 6px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .image-action-btn:hover {
+            background: #f5f5f5;
+            border-color: #4a90e2;
+            color: #4a90e2;
+        }
+
+        .image-action-btn.remove {
+            color: #ff4757;
+        }
+
+        .image-action-btn.remove:hover {
+            background: #fff5f5;
+            border-color: #ff4757;
+        }
+
+        .ppt-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            object-fit: contain;
+        }
+
+        .ppt-image:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .hidden-file-input {
+            display: none;
+        }
+
+        /* 收起状态下的展开按钮 */
+        .property-panel-expand-btn {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 80px;
+            background: #4a90e2;
+            border-radius: 8px 0 0 8px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.15);
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .property-panel.collapsed ~ .property-panel-expand-btn {
+            display: flex;
+        }
+
+
+        .property-panel-expand-btn:hover {
+            background: #357abd;
+            width: 45px;
+        }
+
+        .property-panel-expand-btn::before {
+            content: '◀';
+            color: white;
+            font-size: 20px;
+        }
+
+        .property-group {
+            margin-bottom: 24px;
+        }
+
+        .property-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .property-control {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .property-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+        }
+
+        .align-buttons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .align-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: white;
+        }
+
+        .align-btn.active {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }
+
+        /* 素材中心样式 */
+        .template-layout {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        .template-sidebar {
+            width: 200px;
+            background: #f9f9f9;
+            border-right: 1px solid #e0e0e0;
+            padding: 24px;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .category-list {
+            list-style: none;
+        }
+
+        .category-item {
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: background 0.3s;
+        }
+
+        .category-item:hover {
+            background: #e0e0e0;
+        }
+
+        .category-item.active {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .template-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 24px;
+        }
+
+        .template-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .template-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .template-thumbnail {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 36px;
+        }
+
+        .template-info {
+            padding: 16px;
+        }
+
+        .template-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .template-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* 历史项目样式 */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            padding: 40px;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .project-thumbnail {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+
+        .project-info {
+            padding: 20px;
+        }
+
+        .project-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .project-date {
+            font-size: 13px;
+            color: #999;
+        }
+
+        /* 个人中心样式 */
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .profile-email {
+            color: #999;
+        }
+
+        .profile-section {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-label {
+            color: #666;
+        }
+
+        .info-value {
+            font-weight: bold;
+        }
+
+        .token-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #4a90e2;
+            color: white;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+    </style>
+    <script>
+        // 关键函数必须在HTML元素之前定义，以便onclick属性可以访问
+        window.showPage = function(pageId, triggerElement) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // 移除所有标签的active状态
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 显示选中的页面
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+            
+            // 激活对应的标签
+            if (triggerElement) {
+                triggerElement.classList.add('active');
+            } else {
+                // 如果没有传入triggerElement，通过pageId找到对应的按钮
+                const buttons = document.querySelectorAll('.tab-button');
+                buttons.forEach(btn => {
+                    const onclick = btn.getAttribute('onclick');
+                    if (onclick && onclick.includes(`'${pageId}'`)) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+
+            // 延迟执行需要其他函数的逻辑（在DOMContentLoaded之后）
+            setTimeout(() => {
+                // 如果跳转到AI工作台且有pendingInput，自动填充并发送
+                if (pageId === 'workspace' && window.pendingInput) {
+                    setTimeout(() => {
+                        const workspaceInput = document.querySelector('#workspace .chat-input');
+                        if (workspaceInput) {
+                            workspaceInput.value = window.pendingInput;
+                            // 自动发送消息（如果函数已定义）
+                            if (typeof window.sendWorkspaceMessage === 'function') {
+                                window.sendWorkspaceMessage(window.pendingInput);
+                            }
+                            window.pendingInput = ''; // 清空pendingInput
+                        }
+                    }, 200);
+                }
+
+                // 初始化圈选功能
+                if (pageId === 'workspace') {
+                    // 确保在DOM完全加载后再初始化
+                    const initSelection = () => {
+                        if (typeof window.initSelectionFeature === 'function') {
+                            window.initSelectionFeature();
+                        }
+                    };
+                    
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', function() {
+                            setTimeout(initSelection, 100);
+                        });
+                    } else {
+                        setTimeout(initSelection, 100);
+                    }
+                }
+            }, 0);
+        };
+
+        window.goToWorkspace = function() {
+            const heroInput = document.getElementById('heroChatInput');
+            if (!heroInput) return;
+            
+            const inputValue = heroInput.value.trim();
+            
+            if (!inputValue) {
+                alert('请输入你的PPT需求');
+                heroInput.focus();
+                return;
+            }
+
+            // 保存输入内容到全局变量
+            window.pendingInput = inputValue;
+            
+            // 切换到AI工作台
+            const workspaceTab = Array.from(document.querySelectorAll('.tab-button')).find(btn => 
+                btn.getAttribute('onclick') && btn.getAttribute('onclick').includes('workspace')
+            );
+            if (workspaceTab) {
+                window.showPage('workspace', workspaceTab);
+            } else {
+                window.showPage('workspace');
+            }
+        };
+
+        window.fillQuickInput = function(type) {
+            const heroInput = document.getElementById('heroChatInput');
+            if (!heroInput) return;
+            
+            let placeholder = '';
+            
+            switch(type) {
+                case '一句话生成':
+                    placeholder = '生成一份关于 AI 发展史的演讲 PPT';
+                    break;
+                case '大纲生成':
+                    placeholder = '粘贴你的 PPT 大纲...\n\n例如：\n第一部分：AI 的起源\n- 1950 年代的开端\n- 达特茅斯会议\n\n第二部分：发展历程\n...';
+                    break;
+                case '描述生成':
+                    placeholder = '粘贴你的完整页面描述...\n\n例如：\n第 1 页\n标题：人工智能的诞生\n内容：1950 年，图灵提出"图灵测试"...\n\n第 2 页\n标题：AI 的发展历程\n内容：1950年代：符号主义...\n...';
+                    break;
+            }
+            
+            heroInput.value = placeholder;
+            heroInput.focus();
+        };
+
+        window.togglePropertyPanel = function() {
+            const propertyPanel = document.getElementById('propertyPanel');
+            const expandBtn = document.getElementById('propertyPanelExpandBtn');
+            
+            if (propertyPanel) {
+                const isCollapsed = propertyPanel.classList.contains('collapsed');
+                
+                if (isCollapsed) {
+                    // 展开面板
+                    propertyPanel.classList.remove('collapsed');
+                    if (expandBtn) expandBtn.style.display = 'none';
+                } else {
+                    // 收起面板
+                    propertyPanel.classList.add('collapsed');
+                    if (expandBtn) expandBtn.style.display = 'flex';
+                }
+                
+                // 保存状态到localStorage
+                localStorage.setItem('propertyPanelCollapsed', !isCollapsed);
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="prototype-container">
+        <div class="page-tabs">
+            <button class="tab-button active" onclick="showPage('home', this)">首页</button>
+            <button class="tab-button" onclick="showPage('workspace', this)">AI工作台</button>
+            <button class="tab-button" onclick="showPage('templates', this)">素材中心</button>
+            <button class="tab-button" onclick="showPage('projects', this)">历史项目</button>
+            <button class="tab-button" onclick="showPage('profile', this)">个人中心</button>
+        </div>
+
+        <!-- 首页 -->
+        <div id="home" class="page-content active">
+            <div class="header">
+                <div class="header-logo">AI PPT生成器</div>
+                <div class="header-nav">
+                    <a class="nav-item active">首页</a>
+                    <a class="nav-item">AI工作台</a>
+                    <a class="nav-item">素材中心</a>
+                    <a class="nav-item">历史项目</a>
+                    <a class="nav-item">个人中心</a>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary">开始使用</button>
+                </div>
+            </div>
+
+            <div class="hero-section">
+                <div class="hero-title">AI PPT生成器</div>
+                <div class="hero-subtitle">一句话生成专业PPT，让创作变得简单</div>
+                <div class="hero-chat-box">
+                    <div class="hero-chat-shortcuts">
+                        <div class="hero-shortcut-tag" onclick="fillQuickInput('一句话生成')">一句话生成</div>
+                        <div class="hero-shortcut-tag" onclick="fillQuickInput('大纲生成')">大纲生成</div>
+                        <div class="hero-shortcut-tag" onclick="fillQuickInput('描述生成')">描述生成</div>
+                    </div>
+                    <div class="hero-chat-input-wrapper">
+                        <textarea 
+                            id="heroChatInput" 
+                            class="hero-chat-input" 
+                            placeholder="输入你的PPT需求，例如：做一个我们新产品的介绍PPT..."
+                            rows="2"
+                        ></textarea>
+                        <button class="hero-chat-send" onclick="goToWorkspace()">生成PPT</button>
+                    </div>
+                </div>
+                <div class="hero-chat-hint">💡 提示：输入一句话、大纲或详细描述，AI将自动为你生成专业PPT</div>
+            </div>
+
+            <div class="features-section">
+                <div class="section-title">核心功能</div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">💬</div>
+                        <div class="feature-title">一句话生成</div>
+                        <div class="feature-desc">输入一句话，AI自动生成完整PPT</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📝</div>
+                        <div class="feature-title">大纲生成</div>
+                        <div class="feature-desc">输入大纲，AI自动分页生成PPT</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🖼️</div>
+                        <div class="feature-title">图片识别</div>
+                        <div class="feature-desc">上传图片，AI识别并生成PPT</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <div class="feature-title">智能配图</div>
+                        <div class="feature-desc">AI自动为每页生成合适配图</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">✏️</div>
+                        <div class="feature-title">圈选编辑</div>
+                        <div class="feature-desc">圈选区域，AI生成内容填充</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🗣️</div>
+                        <div class="feature-title">口头修改</div>
+                        <div class="feature-desc">用自然语言修改PPT内容</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-title">实时预览</div>
+                        <div class="feature-desc">生成过程中实时预览效果</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💾</div>
+                        <div class="feature-title">多格式导出</div>
+                        <div class="feature-desc">支持PDF、PPTX格式导出</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cases-section">
+                <div class="section-title">优秀案例</div>
+                <div class="cases-grid">
+                    <div class="case-card">
+                        <div class="case-thumbnail">📊</div>
+                        <div class="case-title">产品介绍PPT</div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-thumbnail">🎓</div>
+                        <div class="case-title">技术分享PPT</div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-thumbnail">💼</div>
+                        <div class="case-title">商业提案PPT</div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-thumbnail">📈</div>
+                        <div class="case-title">数据分析PPT</div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-thumbnail">🚀</div>
+                        <div class="case-title">项目汇报PPT</div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-thumbnail">🎯</div>
+                        <div class="case-title">营销方案PPT</div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-thumbnail">📚</div>
+                        <div class="case-title">课程讲解PPT</div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-thumbnail">💡</div>
+                        <div class="case-title">创意展示PPT</div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-thumbnail">🏆</div>
+                        <div class="case-title">获奖作品PPT</div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-thumbnail">🌟</div>
+                        <div class="case-title">年度总结PPT</div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-thumbnail">🎨</div>
+                        <div class="case-title">设计作品PPT</div>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-thumbnail">📱</div>
+                        <div class="case-title">产品发布PPT</div>
+                    </div>
+                </div>
+                <div class="more-button">
+                    <button class="btn btn-secondary">查看更多案例</button>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>© 2025 AI PPT生成器. All rights reserved.</p>
+            </div>
+        </div>
+
+        <!-- AI工作台 -->
+        <div id="workspace" class="page-content">
+            <div class="workspace-header">
+                <div class="mode-switch">
+                    <button class="mode-btn active">编辑模式</button>
+                    <button class="mode-btn">预览模式</button>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">导出 PDF</button>
+                    <button class="btn btn-primary">导出 PPTX</button>
+                </div>
+            </div>
+
+            <div class="workspace-container">
+                <div class="chat-panel">
+                    <div class="chat-messages">
+                        <div class="message ai">
+                            <div class="message-avatar">AI</div>
+                            <div>
+                                <div class="message-content">你好！我可以帮你生成PPT。你可以：<br>1. 输入一句话描述<br>2. 粘贴大纲内容<br>3. 上传图片<br>4. 描述具体页面内容</div>
+                            </div>
+                        </div>
+                        <div class="message user">
+                            <div class="message-avatar">U</div>
+                            <div>
+                                <div class="message-content">做一个我们新产品的介绍PPT</div>
+                            </div>
+                        </div>
+                        <div class="message ai">
+                            <div class="message-avatar">AI</div>
+                            <div>
+                                <div class="message-content">好的，我为你生成一份产品介绍PPT，包含以下内容：</div>
+                                <div class="suggestion-box">
+                                    <div class="suggestion-title">建议的PPT结构：</div>
+                                    <div class="suggestion-content">
+                                        1. 封面页<br>
+                                        2. 产品概述<br>
+                                        3. 核心功能<br>
+                                        4. 技术优势<br>
+                                        5. 应用场景<br>
+                                        6. 市场分析<br>
+                                        7. 竞争优势<br>
+                                        8. 商业模式<br>
+                                        9. 团队介绍<br>
+                                        10. 联系方式
+                                    </div>
+                                    <button class="confirm-btn">确认生成</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <div class="shortcut-tags">
+                            <div class="tag">一句话生成</div>
+                            <div class="tag">大纲生成</div>
+                            <div class="tag">描述生成</div>
+                        </div>
+                        <div class="input-wrapper">
+                            <textarea class="chat-input" placeholder="输入你的需求..."></textarea>
+                            <button class="send-btn">发送</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="preview-panel">
+                    <div class="selection-hint" id="selectionHint">
+                        💡 <strong>圈选编辑提示：</strong>在编辑模式下，点击PPT中的元素进行圈选。按住 Ctrl/Cmd 键可多选。圈选后点击操作栏的 💬 按钮可将内容添加到Chat，点击 🗑️ 按钮可删除元素。
+                    </div>
+                    <div class="ppt-canvas edit-mode" id="pptCanvas">
+                        <div class="ppt-slide">
+                            <div class="ppt-title" data-element="title" data-type="text" data-content="新产品介绍">新产品介绍</div>
+                            <div class="ppt-content">
+                                <div class="ppt-bullet" data-element="bullet" data-type="text" data-content="创新产品，引领行业">• 创新产品，引领行业</div>
+                                <div class="ppt-bullet" data-element="bullet" data-type="text" data-content="强大功能，卓越体验">• 强大功能，卓越体验</div>
+                                <div class="ppt-bullet" data-element="bullet" data-type="text" data-content="智能AI，助力成长">• 智能AI，助力成长</div>
+                                <!-- 图片示例 -->
+                                <div style="margin-top: 24px; text-align: center;">
+                                    <img src="empty.png" alt="示例图片" class="ppt-image" data-element="image" data-type="image" data-content="empty.png" style="max-width: 400px; display: inline-block; position: relative;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 属性面板（编辑模式下显示） -->
+            <div class="property-panel" id="propertyPanel">
+                <div class="property-panel-header">
+                    <div class="property-panel-title">属性设置</div>
+                    <button class="property-panel-toggle" onclick="togglePropertyPanel()" title="收起">✕</button>
+                </div>
+                <div class="property-panel-content">
+                    <!-- 内容编辑区域 -->
+                    <div class="content-editor" id="contentEditor">
+                        <div class="property-label">内容</div>
+                        <!-- 文本输入框（文本元素时显示） -->
+                        <textarea class="content-text-input" id="contentTextInput" placeholder="输入文本内容..." style="display: none;"></textarea>
+                        <!-- 图片上传区域（图片元素时显示） -->
+                        <div class="image-upload-area" id="imageUploadArea" style="display: none;">
+                            <div class="image-upload-icon">📷</div>
+                            <div class="image-upload-text">点击上传图片</div>
+                            <div class="image-upload-hint">支持 JPG、PNG、GIF 格式</div>
+                            <input type="file" id="imageFileInput" class="hidden-file-input" accept="image/*">
+                        </div>
+                    </div>
+                    <!-- 图片尺寸调整区域（仅图片元素时显示） -->
+                    <div class="property-group" id="imageSizeGroup" style="display: none;">
+                        <div class="property-label">尺寸</div>
+                        <div class="property-control" style="flex-direction: column; gap: 12px;">
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <label style="font-size: 12px; color: #666; width: 50px;">宽度:</label>
+                                <input type="number" id="imageWidthInput" class="property-input" placeholder="宽度(px)" min="1">
+                                <span style="font-size: 12px; color: #999;">px</span>
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <label style="font-size: 12px; color: #666; width: 50px;">高度:</label>
+                                <input type="number" id="imageHeightInput" class="property-input" placeholder="高度(px)" min="1">
+                                <span style="font-size: 12px; color: #999;">px</span>
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <label style="font-size: 12px; color: #666; width: 50px;">比例:</label>
+                                <button id="lockAspectRatio" class="image-action-btn" style="width: auto; padding: 6px 12px;">🔒 锁定</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="property-group">
+                        <div class="property-label">字体</div>
+                        <div class="property-control">
+                            <select class="property-input">
+                                <option>微软雅黑</option>
+                                <option>宋体</option>
+                                <option>Arial</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="property-group">
+                        <div class="property-label">字号</div>
+                        <div class="property-control">
+                            <input type="number" class="property-input" value="18">
+                        </div>
+                    </div>
+                    <div class="property-group">
+                        <div class="property-label">颜色</div>
+                        <div class="property-control">
+                            <div class="color-picker" style="background: #333;"></div>
+                        </div>
+                    </div>
+                    <div class="property-group">
+                        <div class="property-label">对齐</div>
+                        <div class="property-control">
+                            <div class="align-buttons">
+                                <div class="align-btn">左</div>
+                                <div class="align-btn active">中</div>
+                                <div class="align-btn">右</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="property-group">
+                        <div class="property-label">行距</div>
+                        <div class="property-control">
+                            <input type="range" class="property-input" min="1" max="3" step="0.1" value="1.5">
+                        </div>
+                    </div>
+                    <div class="property-group">
+                        <div class="property-label">字间距</div>
+                        <div class="property-control">
+                            <input type="range" class="property-input" min="0" max="10" step="1" value="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 展开按钮（收起时显示） -->
+            <div class="property-panel-expand-btn" id="propertyPanelExpandBtn" onclick="togglePropertyPanel()" title="展开属性面板"></div>
+        </div>
+
+        <!-- 素材中心 -->
+        <div id="templates" class="page-content">
+            <div class="header">
+                <div class="header-logo">AI PPT生成器</div>
+                <div class="header-nav">
+                    <a class="nav-item">首页</a>
+                    <a class="nav-item">AI工作台</a>
+                    <a class="nav-item active">素材中心</a>
+                    <a class="nav-item">历史项目</a>
+                    <a class="nav-item">个人中心</a>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary">我的模板</button>
+                </div>
+            </div>
+
+            <div class="template-layout">
+                <div class="template-sidebar">
+                    <div class="sidebar-title">分类</div>
+                    <ul class="category-list">
+                        <li class="category-item active">全部</li>
+                        <li class="category-item">商务</li>
+                        <li class="category-item">教育</li>
+                        <li class="category-item">科技</li>
+                        <li class="category-item">营销</li>
+                        <li class="category-item">汇报</li>
+                        <li class="category-item">创意</li>
+                    </ul>
+                </div>
+                <div class="template-content">
+                    <div class="template-grid">
+                        <div class="template-card">
+                            <div class="template-thumbnail">📊</div>
+                            <div class="template-info">
+                                <div class="template-name">商务汇报模板</div>
+                                <div class="template-desc">适合商务汇报、项目总结等场景</div>
+                            </div>
+                        </div>
+                        <div class="template-card">
+                            <div class="template-thumbnail">🎓</div>
+                            <div class="template-info">
+                                <div class="template-name">教育课件模板</div>
+                                <div class="template-desc">适合教学课件、培训材料等场景</div>
+                            </div>
+                        </div>
+                        <div class="template-card">
+                            <div class="template-thumbnail">💼</div>
+                            <div class="template-info">
+                                <div class="template-name">商业提案模板</div>
+                                <div class="template-desc">适合商业提案、投资路演等场景</div>
+                            </div>
+                        </div>
+                        <div class="template-card">
+                            <div class="template-thumbnail">🚀</div>
+                            <div class="template-info">
+                                <div class="template-name">产品发布模板</div>
+                                <div class="template-desc">适合产品发布、新品介绍等场景</div>
+                            </div>
+                        </div>
+                        <div class="template-card">
+                            <div class="template-thumbnail">📈</div>
+                            <div class="template-info">
+                                <div class="template-name">数据分析模板</div>
+                                <div class="template-desc">适合数据分析、报告展示等场景</div>
+                            </div>
+                        </div>
+                        <div class="template-card">
+                            <div class="template-thumbnail">🎨</div>
+                            <div class="template-info">
+                                <div class="template-name">创意设计模板</div>
+                                <div class="template-desc">适合创意展示、设计作品等场景</div>
+                            </div>
+                        </div>
+                        <div class="template-card">
+                            <div class="template-thumbnail">🏆</div>
+                            <div class="template-info">
+                                <div class="template-name">获奖作品模板</div>
+                                <div class="template-desc">适合获奖展示、成果汇报等场景</div>
+                            </div>
+                        </div>
+                        <div class="template-card">
+                            <div class="template-thumbnail">🌟</div>
+                            <div class="template-info">
+                                <div class="template-name">年度总结模板</div>
+                                <div class="template-desc">适合年度总结、工作汇报等场景</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 历史项目 -->
+        <div id="projects" class="page-content">
+            <div class="header">
+                <div class="header-logo">AI PPT生成器</div>
+                <div class="header-nav">
+                    <a class="nav-item">首页</a>
+                    <a class="nav-item">AI工作台</a>
+                    <a class="nav-item">素材中心</a>
+                    <a class="nav-item active">历史项目</a>
+                    <a class="nav-item">个人中心</a>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary">新建项目</button>
+                </div>
+            </div>
+
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-thumbnail">📊</div>
+                    <div class="project-info">
+                        <div class="project-title">产品介绍PPT</div>
+                        <div class="project-date">2025-01-28 14:30</div>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div class="project-thumbnail">🎓</div>
+                    <div class="project-info">
+                        <div class="project-title">技术分享PPT</div>
+                        <div class="project-date">2025-01-27 10:15</div>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div class="project-thumbnail">💼</div>
+                    <div class="project-info">
+                        <div class="project-title">商业提案PPT</div>
+                        <div class="project-date">2025-01-26 16:45</div>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div class="project-thumbnail">📈</div>
+                    <div class="project-info">
+                        <div class="project-title">数据分析PPT</div>
+                        <div class="project-date">2025-01-25 09:20</div>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div class="project-thumbnail">🚀</div>
+                    <div class="project-info">
+                        <div class="project-title">项目汇报PPT</div>
+                        <div class="project-date">2025-01-24 11:30</div>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <div class="project-thumbnail">🎯</div>
+                    <div class="project-info">
+                        <div class="project-title">营销方案PPT</div>
+                        <div class="project-date">2025-01-23 15:00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 个人中心 -->
+        <div id="profile" class="page-content">
+            <div class="header">
+                <div class="header-logo">AI PPT生成器</div>
+                <div class="header-nav">
+                    <a class="nav-item">首页</a>
+                    <a class="nav-item">AI工作台</a>
+                    <a class="nav-item">素材中心</a>
+                    <a class="nav-item">历史项目</a>
+                    <a class="nav-item active">个人中心</a>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary">设置</button>
+                </div>
+            </div>
+
+            <div class="profile-container">
+                <div class="profile-header">
+                    <div class="profile-avatar">U</div>
+                    <div class="profile-name">用户名</div>
+                    <div class="profile-email">user@example.com</div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="section-header">账户信息</div>
+                    <div class="info-item">
+                        <span class="info-label">用户ID</span>
+                        <span class="info-value">123456</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">注册时间</span>
+                        <span class="info-value">2025-01-01</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">会员状态</span>
+                        <span class="info-value">普通用户</span>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="section-header">Token信息</div>
+                    <div class="info-item">
+                        <span class="info-label">剩余Token</span>
+                        <span class="info-value"><span class="token-badge">10,000</span></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">已使用Token</span>
+                        <span class="info-value">5,000</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">总Token</span>
+                        <span class="info-value">15,000</span>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="section-header">使用统计</div>
+                    <div class="info-item">
+                        <span class="info-label">创建项目数</span>
+                        <span class="info-value">25</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">导出文件数</span>
+                        <span class="info-value">18</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">使用模板数</span>
+                        <span class="info-value">12</span>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="section-header">订单管理</div>
+                    <div class="info-item">
+                        <span class="info-label">充值订单</span>
+                        <span class="info-value"><button class="btn btn-secondary">查看订单</button></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">购买Token</span>
+                        <span class="info-value"><button class="btn btn-primary">立即充值</button></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 存储从首页传递的内容（全局变量）
+        window.pendingInput = '';
+
+        // 在AI工作台发送消息
+        window.sendWorkspaceMessage = function(message) {
+            const chatMessages = document.querySelector('#workspace .chat-messages');
+            const workspaceInput = document.querySelector('#workspace .chat-input');
+            
+            if (!chatMessages || !workspaceInput) return;
+
+            // 添加用户消息
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.innerHTML = `
+                <div class="message-avatar">U</div>
+                <div>
+                    <div class="message-content">${message}</div>
+                </div>
+            `;
+            chatMessages.appendChild(userMessage);
+
+            // 清空输入框
+            workspaceInput.value = '';
+
+            // 滚动到底部
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // 模拟AI回复
+            setTimeout(() => {
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'message ai';
+                aiMessage.innerHTML = `
+                    <div class="message-avatar">AI</div>
+                    <div>
+                        <div class="message-content">好的，我正在为你生成PPT...</div>
+                    </div>
+                `;
+                chatMessages.appendChild(aiMessage);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                // 模拟生成过程
+                setTimeout(() => {
+                    const suggestionBox = document.createElement('div');
+                    suggestionBox.className = 'suggestion-box';
+                    suggestionBox.innerHTML = `
+                        <div class="suggestion-title">建议的PPT结构：</div>
+                        <div class="suggestion-content">
+                            1. 封面页<br>
+                            2. 内容概述<br>
+                            3. 详细内容<br>
+                            4. 总结页
+                        </div>
+                        <button class="confirm-btn" onclick="confirmGenerate()">确认生成</button>
+                    `;
+                    aiMessage.querySelector('div').appendChild(suggestionBox);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+            }, 500);
+        };
+
+        // 确认生成
+        window.confirmGenerate = function() {
+            const chatMessages = document.querySelector('#workspace .chat-messages');
+            const aiMessage = chatMessages.querySelector('.message.ai:last-child');
+            
+            if (aiMessage) {
+                aiMessage.querySelector('.suggestion-box').innerHTML = '<div class="suggestion-content">正在生成PPT，请稍候...</div>';
+                
+                // 模拟生成PPT
+                setTimeout(() => {
+                    aiMessage.querySelector('.suggestion-box').innerHTML = '<div class="suggestion-content" style="color: #4a90e2;">✅ PPT生成完成！</div>';
+                    
+                    // 更新预览区域
+                    const pptCanvas = document.querySelector('#workspace .ppt-canvas');
+                    if (pptCanvas) {
+                        pptCanvas.innerHTML = `
+                            <div class="ppt-slide">
+                                <div class="ppt-title">生成的PPT标题</div>
+                                <div class="ppt-content">
+                                    <div class="ppt-bullet">• 内容要点1</div>
+                                    <div class="ppt-bullet">• 内容要点2</div>
+                                    <div class="ppt-bullet">• 内容要点3</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }, 2000);
+            }
+        };
+
+        // 圈选功能
+        let selectedElements = new Set();
+        let isMultiSelectMode = false;
+        let isMoveMode = false;
+        let isDragging = false;
+        let dragStartX, dragStartY, dragStartLeft, dragStartTop;
+
+        // 初始化圈选功能
+        window.initSelectionFeature = function() {
+            const pptCanvas = document.getElementById('pptCanvas');
+            if (!pptCanvas) {
+                return;
+            }
+
+            // 检查是否在编辑模式
+            const activeModeBtn = document.querySelector('#workspace .mode-btn.active');
+            const isEditMode = activeModeBtn && activeModeBtn.textContent.trim() === '编辑模式';
+            
+            if (!isEditMode) {
+                if (typeof clearSelection === 'function') {
+                    clearSelection();
+                }
+                return;
+            }
+
+            // 清除之前的事件监听器（通过克隆节点）
+            const newCanvas = pptCanvas.cloneNode(true);
+            pptCanvas.parentNode.replaceChild(newCanvas, pptCanvas);
+
+            // 获取所有可选择的元素（包括文本和图片）
+            const selectableElements = newCanvas.querySelectorAll('.ppt-title, .ppt-bullet, .ppt-image');
+            
+            // 绑定元素点击事件（直接绑定到克隆后的元素）
+            selectableElements.forEach(element => {
+                // 确保元素可以接收点击事件
+                element.style.cursor = 'pointer';
+                element.style.userSelect = 'none';
+                element.style.pointerEvents = 'auto';
+                
+                // 绑定点击事件
+                element.addEventListener('click', function(e) {
+                    e.stopPropagation(); // 阻止事件冒泡到画布
+                    e.preventDefault(); // 阻止默认行为
+                    
+                    if (typeof handleElementClick === 'function') {
+                        handleElementClick(this, e);
+                    }
+                });
+            });
+
+            // 绑定画布的点击事件（处理空白处点击）
+            newCanvas.addEventListener('click', function(e) {
+                // 检查点击的是否是可选择的元素或其子元素
+                const clickedElement = e.target;
+                const isSelectable = clickedElement.classList.contains('ppt-title') || 
+                                    clickedElement.classList.contains('ppt-bullet') || 
+                                    clickedElement.classList.contains('ppt-image') ||
+                                    clickedElement.closest('.ppt-title') ||
+                                    clickedElement.closest('.ppt-bullet') ||
+                                    clickedElement.closest('.ppt-image') ||
+                                    clickedElement.closest('.selected-element') ||
+                                    clickedElement.closest('.selection-toolbar') ||
+                                    clickedElement.closest('.resize-handle');
+                
+                // 如果点击的是可选择的元素或相关UI，不处理
+                if (isSelectable) {
+                    return;
+                }
+                
+                // 如果点击的是画布空白处，取消选择
+                if (e.target === newCanvas || 
+                    e.target.classList.contains('ppt-slide') || 
+                    e.target.classList.contains('ppt-content')) {
+                    if (typeof clearSelection === 'function') {
+                        clearSelection();
+                    }
+                }
+            });
+
+            // 更新全局引用
+            window.pptCanvas = newCanvas;
+        };
+
+        // 处理元素点击
+        function handleElementClick(element, e) {
+            // 注意：stopPropagation 已经在元素的事件监听器中调用了
+            
+            // 如果点击的是调整点或操作栏，不处理
+            if (e.target.classList.contains('resize-handle') || 
+                e.target.classList.contains('toolbar-icon') ||
+                e.target.closest('.selection-toolbar')) {
+                return;
+            }
+            
+            // 如果处于拖拽模式，不处理点击（由拖拽事件处理）
+            if (isMoveMode && isDragging) {
+                return;
+            }
+            
+            e.preventDefault(); // 阻止默认行为，特别是图片的拖拽
+
+            // 如果按住Ctrl/Cmd键，进入多选模式
+            if (e.ctrlKey || e.metaKey) {
+                isMultiSelectMode = true;
+                toggleElementSelection(element);
+            } else {
+                // 单选模式
+                if (!selectedElements.has(element)) {
+                    clearSelection();
+                    selectElement(element);
+                    // 如果属性面板已打开，更新到新选中的元素
+                    const propertyPanel = document.getElementById('propertyPanel');
+                    if (propertyPanel && !propertyPanel.classList.contains('collapsed')) {
+                        openPropertyPanel(element);
+                    }
+                } else {
+                    // 如果点击已选中的元素，取消选择（除非处于拖拽模式）
+                    if (!isMoveMode) {
+                        deselectElement(element);
+                    }
+                }
+            }
+
+            updateSelectionToolbar();
+        }
+
+        // 选择元素
+        function selectElement(element) {
+            if (selectedElements.has(element)) return;
+            
+            selectedElements.add(element);
+            element.classList.add('selected-element');
+            
+            // 确保图片元素有正确的定位上下文
+            if (element.tagName === 'IMG') {
+                // 确保图片元素是inline-block或block，并且有relative定位
+                element.style.position = 'relative';
+                element.style.display = 'inline-block';
+                element.style.boxSizing = 'border-box';
+            }
+            
+            // 创建操作栏
+            createToolbar(element);
+            
+            // 创建调整点（仅单选时）
+            if (selectedElements.size === 1) {
+                createResizeHandles(element);
+            }
+        }
+
+        // 取消选择元素
+        function deselectElement(element) {
+            selectedElements.delete(element);
+            element.classList.remove('selected-element');
+            element.classList.remove('dragging');
+            element.classList.remove('resizing');
+            
+            // 移除操作栏
+            const toolbar = element.querySelector('.selection-toolbar');
+            if (toolbar) {
+                toolbar.remove();
+            }
+            
+            // 移除调整点
+            removeResizeHandles(element);
+        }
+
+        // 切换元素选择状态
+        function toggleElementSelection(element) {
+            if (selectedElements.has(element)) {
+                deselectElement(element);
+            } else {
+                selectElement(element);
+            }
+        }
+
+        // 清除所有选择
+        function clearSelection() {
+            const elementsToDeselect = Array.from(selectedElements);
+            elementsToDeselect.forEach(element => {
+                deselectElement(element);
+            });
+            selectedElements.clear();
+            isMultiSelectMode = false;
+            isMoveMode = false;
+            isDragging = false;
+        }
+
+        // 创建操作栏
+        function createToolbar(element) {
+            // 如果已有操作栏，不重复创建
+            if (element.querySelector('.selection-toolbar')) return;
+
+            const toolbar = document.createElement('div');
+            toolbar.className = 'selection-toolbar';
+            
+            // 编辑按钮（仅单选时显示）
+            // 注意：此时selectedElements.size应该已经是1了，因为selectElement先add再调用createToolbar
+            if (selectedElements.size === 1) {
+                const editBtn = document.createElement('div');
+                editBtn.className = 'toolbar-icon edit';
+                editBtn.innerHTML = '✏️';
+                editBtn.title = '编辑';
+                editBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    openPropertyPanel(element);
+                };
+                toolbar.appendChild(editBtn);
+
+                // 拖拽按钮（仅单选时显示）
+                const moveBtn = document.createElement('div');
+                moveBtn.className = 'toolbar-icon move';
+                moveBtn.innerHTML = '↔️';
+                moveBtn.title = '拖拽移动';
+                moveBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    toggleMoveMode(element);
+                };
+                toolbar.appendChild(moveBtn);
+            }
+            
+            // 确保操作栏能正确显示（特别是图片元素）
+            // 对于图片元素，操作栏应该显示在图片上方
+            if (element.tagName === 'IMG') {
+                toolbar.style.top = '-50px'; // 图片元素可能需要更多空间
+            }
+
+            // 添加到Chat按钮
+            const addToChatBtn = document.createElement('div');
+            addToChatBtn.className = 'toolbar-icon add-to-chat';
+            addToChatBtn.innerHTML = '💬';
+            addToChatBtn.title = '添加到Chat';
+            addToChatBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (selectedElements.size > 1) {
+                    // 多选时，添加所有选中内容
+                    addMultipleToChat();
+                } else {
+                    addToChat(element);
+                }
+            };
+
+            // 删除按钮
+            const deleteBtn = document.createElement('div');
+            deleteBtn.className = 'toolbar-icon delete';
+            deleteBtn.innerHTML = '🗑️';
+            deleteBtn.title = '删除';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (selectedElements.size > 1) {
+                    // 多选时，删除所有选中元素
+                    deleteMultipleElements();
+                } else {
+                    deleteElement(element);
+                }
+            };
+
+            toolbar.appendChild(addToChatBtn);
+            toolbar.appendChild(deleteBtn);
+            
+            // 将操作栏添加到元素
+            element.appendChild(toolbar);
+            
+            // 确保操作栏可见（确保z-index足够高）
+            toolbar.style.zIndex = '1000';
+            
+            // 对于图片元素，确保操作栏显示在图片上方
+            if (element.tagName === 'IMG') {
+                // 检查操作栏是否成功添加
+                const addedToolbar = element.querySelector('.selection-toolbar');
+                if (!addedToolbar) {
+                    console.warn('操作栏添加失败，尝试重新添加');
+                    // 如果添加失败，尝试使用insertBefore
+                    if (element.parentNode) {
+                        element.parentNode.insertBefore(toolbar, element.nextSibling);
+                        toolbar.style.position = 'absolute';
+                        toolbar.style.top = '-50px';
+                        toolbar.style.right = '0';
+                    }
+                }
+            }
+        }
+
+        // 创建调整点
+        function createResizeHandles(element) {
+            // 如果已有调整点，不重复创建
+            if (element.querySelector('.resize-handle')) return;
+
+            const handles = [
+                { class: 'nw', cursor: 'nw-resize' }, // 左上
+                { class: 'n', cursor: 'n-resize' },   // 上中
+                { class: 'ne', cursor: 'ne-resize' }, // 右上
+                { class: 'e', cursor: 'e-resize' },   // 右中
+                { class: 'se', cursor: 'se-resize' }, // 右下
+                { class: 's', cursor: 's-resize' },   // 下中
+                { class: 'sw', cursor: 'sw-resize' }, // 左下
+                { class: 'w', cursor: 'w-resize' }    // 左中
+            ];
+
+            handles.forEach(handle => {
+                const handleEl = document.createElement('div');
+                handleEl.className = `resize-handle ${handle.class}`;
+                handleEl.style.cursor = handle.cursor;
+                handleEl.onmousedown = (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    startResize(element, handle.class, e);
+                };
+                element.appendChild(handleEl);
+            });
+        }
+
+        // 移除调整点
+        function removeResizeHandles(element) {
+            const handles = element.querySelectorAll('.resize-handle');
+            handles.forEach(handle => handle.remove());
+        }
+
+        // 开始调整大小
+        let isResizing = false;
+        let resizeHandle = null;
+        let startX, startY, startWidth, startHeight, startLeft, startTop;
+
+        function startResize(element, handleClass, e) {
+            isResizing = true;
+            resizeHandle = handleClass;
+            element.classList.add('resizing');
+
+            const rect = element.getBoundingClientRect();
+            const canvas = element.closest('.ppt-canvas');
+            const canvasRect = canvas ? canvas.getBoundingClientRect() : { left: 0, top: 0 };
+            
+            startX = e.clientX;
+            startY = e.clientY;
+            startWidth = rect.width;
+            startHeight = rect.height;
+            startLeft = rect.left - canvasRect.left;
+            startTop = rect.top - canvasRect.top;
+
+            document.addEventListener('mousemove', handleResize);
+            document.addEventListener('mouseup', stopResize);
+        }
+
+        function handleResize(e) {
+            if (!isResizing) return;
+
+            const element = Array.from(selectedElements)[0];
+            if (!element) return;
+
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+
+            let newWidth = startWidth;
+            let newHeight = startHeight;
+            let newLeft = startLeft;
+            let newTop = startTop;
+
+            // 根据调整点位置计算新尺寸和位置
+            switch(resizeHandle) {
+                case 'nw': // 左上
+                    newWidth = startWidth - deltaX;
+                    newHeight = startHeight - deltaY;
+                    newLeft = startLeft + deltaX;
+                    newTop = startTop + deltaY;
+                    break;
+                case 'n': // 上
+                    newHeight = startHeight - deltaY;
+                    newTop = startTop + deltaY;
+                    break;
+                case 'ne': // 右上
+                    newWidth = startWidth + deltaX;
+                    newHeight = startHeight - deltaY;
+                    newTop = startTop + deltaY;
+                    break;
+                case 'e': // 右
+                    newWidth = startWidth + deltaX;
+                    break;
+                case 'se': // 右下
+                    newWidth = startWidth + deltaX;
+                    newHeight = startHeight + deltaY;
+                    break;
+                case 's': // 下
+                    newHeight = startHeight + deltaY;
+                    break;
+                case 'sw': // 左下
+                    newWidth = startWidth - deltaX;
+                    newHeight = startHeight + deltaY;
+                    newLeft = startLeft + deltaX;
+                    break;
+                case 'w': // 左
+                    newWidth = startWidth - deltaX;
+                    newLeft = startLeft + deltaX;
+                    break;
+            }
+
+            // 限制最小尺寸
+            const minSize = 20;
+            if (newWidth < minSize) {
+                newWidth = minSize;
+                if (resizeHandle.includes('w')) {
+                    newLeft = startLeft + startWidth - minSize;
+                }
+            }
+            if (newHeight < minSize) {
+                newHeight = minSize;
+                if (resizeHandle.includes('n')) {
+                    newTop = startTop + startHeight - minSize;
+                }
+            }
+
+            // 应用新尺寸和位置
+            element.style.width = newWidth + 'px';
+            element.style.height = newHeight + 'px';
+            
+            // 如果元素有定位，更新位置
+            const computedStyle = window.getComputedStyle(element);
+            if (computedStyle.position === 'absolute' || element.style.position === 'absolute') {
+                element.style.position = 'absolute';
+                element.style.left = newLeft + 'px';
+                element.style.top = newTop + 'px';
+            } else {
+                // 对于非绝对定位的元素，转换为绝对定位
+                const canvas = element.closest('.ppt-canvas');
+                const canvasRect = canvas ? canvas.getBoundingClientRect() : { left: 0, top: 0 };
+                const rect = element.getBoundingClientRect();
+                element.style.position = 'absolute';
+                element.style.left = (rect.left - canvasRect.left) + 'px';
+                element.style.top = (rect.top - canvasRect.top) + 'px';
+            }
+
+            // 更新图片元素的width和height属性
+            if (element.tagName === 'IMG') {
+                element.width = newWidth;
+                element.height = newHeight;
+            }
+        }
+
+        function stopResize() {
+            isResizing = false;
+            resizeHandle = null;
+            const element = Array.from(selectedElements)[0];
+            if (element) {
+                element.classList.remove('resizing');
+            }
+            document.removeEventListener('mousemove', handleResize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+
+        // 拖拽移动模式（全局变量在文件顶部已定义）
+        function toggleMoveMode(element) {
+            isMoveMode = !isMoveMode;
+            const moveBtn = element.querySelector('.toolbar-icon.move');
+            
+            if (isMoveMode) {
+                element.classList.add('dragging');
+                element.style.cursor = 'move';
+                if (moveBtn) moveBtn.classList.add('active');
+                
+                // 确保元素有定位
+                const computedStyle = window.getComputedStyle(element);
+                if (computedStyle.position === 'static') {
+                    const rect = element.getBoundingClientRect();
+                    const canvas = element.closest('.ppt-canvas');
+                    const canvasRect = canvas ? canvas.getBoundingClientRect() : { left: 0, top: 0 };
+                    element.style.position = 'absolute';
+                    element.style.left = (rect.left - canvasRect.left) + 'px';
+                    element.style.top = (rect.top - canvasRect.top) + 'px';
+                }
+                
+                // 绑定拖拽事件
+                element.onmousedown = (e) => {
+                    if (e.target.classList.contains('resize-handle') || 
+                        e.target.classList.contains('toolbar-icon') ||
+                        e.target.closest('.selection-toolbar')) {
+                        return;
+                    }
+                    startDrag(element, e);
+                };
+            } else {
+                element.classList.remove('dragging');
+                element.style.cursor = '';
+                if (moveBtn) moveBtn.classList.remove('active');
+                element.onmousedown = null;
+                // 如果正在拖拽，停止拖拽
+                if (isDragging) {
+                    stopDrag();
+                }
+            }
+        }
+
+        function startDrag(element, e) {
+            isDragging = true;
+            e.preventDefault();
+            e.stopPropagation();
+
+            const rect = element.getBoundingClientRect();
+            const canvas = element.closest('.ppt-canvas');
+            const canvasRect = canvas ? canvas.getBoundingClientRect() : { left: 0, top: 0 };
+            
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            dragStartLeft = rect.left - canvasRect.left;
+            dragStartTop = rect.top - canvasRect.top;
+
+            document.addEventListener('mousemove', handleDrag);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        function handleDrag(e) {
+            if (!isDragging) return;
+
+            const element = Array.from(selectedElements)[0];
+            if (!element) return;
+
+            const deltaX = e.clientX - dragStartX;
+            const deltaY = e.clientY - dragStartY;
+
+            const newLeft = dragStartLeft + deltaX;
+            const newTop = dragStartTop + deltaY;
+
+            // 限制在画布范围内
+            const canvas = element.closest('.ppt-canvas');
+            if (canvas) {
+                const canvasRect = canvas.getBoundingClientRect();
+                const elementRect = element.getBoundingClientRect();
+                const maxLeft = canvasRect.width - elementRect.width;
+                const maxTop = canvasRect.height - elementRect.height;
+
+                const clampedLeft = Math.max(0, Math.min(newLeft, maxLeft));
+                const clampedTop = Math.max(0, Math.min(newTop, maxTop));
+
+                element.style.left = clampedLeft + 'px';
+                element.style.top = clampedTop + 'px';
+            } else {
+                element.style.left = newLeft + 'px';
+                element.style.top = newTop + 'px';
+            }
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', handleDrag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        // 添加多个选中元素到Chat
+        function addMultipleToChat() {
+            const contents = Array.from(selectedElements).map(el => {
+                const elementType = el.getAttribute('data-type') || 'text';
+                if (elementType === 'image') {
+                    const imgSrc = el.src || el.getAttribute('data-content') || '';
+                    return `[图片] ${imgSrc}`;
+                } else {
+                    return el.getAttribute('data-content') || el.textContent.trim();
+                }
+            });
+            
+            const workspaceInput = document.querySelector('#workspace .chat-input');
+            if (workspaceInput) {
+                const currentValue = workspaceInput.value.trim();
+                const newContent = '[圈选内容]\n' + contents.map((c, i) => `${i + 1}. ${c}`).join('\n');
+                
+                if (currentValue) {
+                    workspaceInput.value = currentValue + '\n\n' + newContent;
+                } else {
+                    workspaceInput.value = newContent;
+                }
+                
+                workspaceInput.focus();
+                workspaceInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                workspaceInput.style.borderColor = '#4a90e2';
+                workspaceInput.style.boxShadow = '0 0 0 3px rgba(74, 144, 226, 0.2)';
+                setTimeout(() => {
+                    workspaceInput.style.borderColor = '';
+                    workspaceInput.style.boxShadow = '';
+                }, 2000);
+            }
+
+            clearSelection();
+        }
+
+        // 删除多个选中元素
+        function deleteMultipleElements() {
+            if (confirm(`确定要删除选中的 ${selectedElements.size} 个元素吗？`)) {
+                selectedElements.forEach(element => {
+                    element.remove();
+                });
+                clearSelection();
+            }
+        }
+
+        // 更新选择工具栏（多选时显示计数）
+        function updateSelectionToolbar() {
+            if (selectedElements.size > 1) {
+                selectedElements.forEach(element => {
+                    let toolbar = element.querySelector('.selection-toolbar');
+                    if (toolbar) {
+                        // 多选时移除编辑按钮和拖拽按钮
+                        const editBtn = toolbar.querySelector('.toolbar-icon.edit');
+                        if (editBtn) {
+                            editBtn.remove();
+                        }
+                        const moveBtn = toolbar.querySelector('.toolbar-icon.move');
+                        if (moveBtn) {
+                            moveBtn.remove();
+                        }
+                        
+                        // 移除调整点
+                        removeResizeHandles(element);
+                        
+                        let countBadge = toolbar.querySelector('.selection-count');
+                        if (!countBadge) {
+                            countBadge = document.createElement('div');
+                            countBadge.className = 'selection-count';
+                            toolbar.insertBefore(countBadge, toolbar.firstChild);
+                        }
+                        countBadge.textContent = `已选择 ${selectedElements.size} 项`;
+                    }
+                });
+            } else {
+                selectedElements.forEach(element => {
+                    const toolbar = element.querySelector('.selection-toolbar');
+                    if (toolbar) {
+                        const countBadge = toolbar.querySelector('.selection-count');
+                        if (countBadge) {
+                            countBadge.remove();
+                        }
+                        
+                        // 单选时添加编辑按钮（如果不存在）
+                        if (!toolbar.querySelector('.toolbar-icon.edit')) {
+                            const editBtn = document.createElement('div');
+                            editBtn.className = 'toolbar-icon edit';
+                            editBtn.innerHTML = '✏️';
+                            editBtn.title = '编辑';
+                            editBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                openPropertyPanel(element);
+                            };
+                            toolbar.insertBefore(editBtn, toolbar.firstChild);
+                        }
+                        
+                        // 单选时添加拖拽按钮（如果不存在）
+                        if (!toolbar.querySelector('.toolbar-icon.move')) {
+                            const moveBtn = document.createElement('div');
+                            moveBtn.className = 'toolbar-icon move';
+                            moveBtn.innerHTML = '↔️';
+                            moveBtn.title = '拖拽移动';
+                            moveBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                toggleMoveMode(element);
+                            };
+                            const editBtn = toolbar.querySelector('.toolbar-icon.edit');
+                            if (editBtn) {
+                                editBtn.after(moveBtn);
+                            } else {
+                                toolbar.insertBefore(moveBtn, toolbar.firstChild);
+                            }
+                        }
+                        
+                        // 创建调整点（如果不存在）
+                        if (!element.querySelector('.resize-handle')) {
+                            createResizeHandles(element);
+                        }
+                        
+                        // 如果属性面板已打开，更新到当前选中的元素
+                        const propertyPanel = document.getElementById('propertyPanel');
+                        if (propertyPanel && !propertyPanel.classList.contains('collapsed')) {
+                            openPropertyPanel(element);
+                        }
+                    }
+                });
+            }
+        }
+
+        // 打开属性面板并绑定选中元素
+        function openPropertyPanel(element) {
+            const propertyPanel = document.getElementById('propertyPanel');
+            const expandBtn = document.getElementById('propertyPanelExpandBtn');
+            
+            if (!propertyPanel) return;
+            
+            // 确保属性面板展开
+            propertyPanel.classList.remove('collapsed');
+            if (expandBtn) expandBtn.style.display = 'none';
+            
+            // 保存当前编辑的元素
+            window.currentEditingElement = element;
+            
+            // 加载元素的当前属性到属性面板
+            loadElementProperties(element);
+            
+            // 绑定属性变化事件
+            bindPropertyEvents(element);
+        }
+
+        // 加载元素属性到属性面板
+        function loadElementProperties(element) {
+            const propertyPanel = document.getElementById('propertyPanel');
+            if (!propertyPanel) return;
+            
+            // 获取元素类型
+            const elementType = element.getAttribute('data-type') || 'text';
+            const contentTextInput = document.getElementById('contentTextInput');
+            const imageUploadArea = document.getElementById('imageUploadArea');
+            const imageFileInput = document.getElementById('imageFileInput');
+            
+            // 根据元素类型显示不同的内容编辑器
+            if (elementType === 'image') {
+                // 图片元素：显示图片上传区域
+                if (contentTextInput) contentTextInput.style.display = 'none';
+                if (imageUploadArea) {
+                    imageUploadArea.style.display = 'block';
+                    
+                    // 如果已有图片，显示预览
+                    const imgSrc = element.src || element.getAttribute('data-content');
+                    if (imgSrc && imgSrc !== 'empty.png') {
+                        showImagePreview(imgSrc);
+                    } else {
+                        showImageUploadPlaceholder();
+                    }
+                }
+                
+                // 显示图片尺寸调整区域
+                const imageSizeGroup = document.getElementById('imageSizeGroup');
+                if (imageSizeGroup) {
+                    imageSizeGroup.style.display = 'block';
+                    
+                    // 加载当前图片尺寸
+                    const currentWidth = element.style.width || element.width || '';
+                    const currentHeight = element.style.height || element.height || '';
+                    
+                    const widthInput = document.getElementById('imageWidthInput');
+                    const heightInput = document.getElementById('imageHeightInput');
+                    
+                    if (widthInput) {
+                        const width = currentWidth ? parseInt(currentWidth) : (element.naturalWidth || 400);
+                        widthInput.value = width;
+                    }
+                    
+                    if (heightInput) {
+                        const height = currentHeight ? parseInt(currentHeight) : (element.naturalHeight || 300);
+                        heightInput.value = height;
+                    }
+                }
+                
+                // 隐藏文本相关的属性（字体、字号、颜色、对齐、行距、字间距）
+                const textProperties = propertyPanel.querySelectorAll('.property-group');
+                textProperties.forEach((group) => {
+                    // 跳过内容编辑区域和图片尺寸区域
+                    if (group.id !== 'imageSizeGroup' && group.id !== 'contentEditor') {
+                        group.style.display = 'none';
+                    }
+                });
+            } else {
+                // 文本元素：显示文本输入框
+                if (imageUploadArea) imageUploadArea.style.display = 'none';
+                if (contentTextInput) {
+                    contentTextInput.style.display = 'block';
+                    // 加载文本内容
+                    const textContent = element.textContent.trim() || element.getAttribute('data-content') || '';
+                    // 移除项目符号
+                    contentTextInput.value = textContent.replace(/^[•·\-\*]\s*/, '');
+                }
+                
+                // 隐藏图片尺寸调整区域
+                const imageSizeGroup = document.getElementById('imageSizeGroup');
+                if (imageSizeGroup) {
+                    imageSizeGroup.style.display = 'none';
+                }
+                
+                // 显示文本相关的属性
+                const textProperties = propertyPanel.querySelectorAll('.property-group');
+                textProperties.forEach((group) => {
+                    // 跳过内容编辑区域和图片尺寸区域
+                    if (group.id !== 'imageSizeGroup' && group.id !== 'contentEditor') {
+                        group.style.display = 'block';
+                    }
+                });
+                
+                // 获取元素的样式
+                const computedStyle = window.getComputedStyle(element);
+                
+                // 设置字体
+                const fontSelect = propertyPanel.querySelector('.property-group select');
+                if (fontSelect) {
+                    const fontFamily = computedStyle.fontFamily || '微软雅黑';
+                    fontSelect.value = fontFamily.includes('微软雅黑') ? '微软雅黑' : 
+                                     fontFamily.includes('宋体') ? '宋体' : 
+                                     fontFamily.includes('Arial') ? 'Arial' : '微软雅黑';
+                }
+                
+                // 设置字号
+                const fontSizeInput = propertyPanel.querySelector('.property-group input[type="number"]');
+                if (fontSizeInput) {
+                    const fontSize = parseInt(computedStyle.fontSize);
+                    fontSizeInput.value = fontSize || 18;
+                }
+                
+                // 设置颜色
+                const colorPicker = propertyPanel.querySelector('.color-picker');
+                if (colorPicker) {
+                    const color = computedStyle.color || '#333';
+                    colorPicker.style.background = color;
+                }
+                
+                // 设置对齐（根据textAlign）
+                const alignButtons = propertyPanel.querySelectorAll('.align-btn');
+                if (alignButtons.length > 0) {
+                    alignButtons.forEach(btn => btn.classList.remove('active'));
+                    const textAlign = computedStyle.textAlign || 'center';
+                    if (textAlign === 'left') alignButtons[0].classList.add('active');
+                    else if (textAlign === 'center') alignButtons[1].classList.add('active');
+                    else if (textAlign === 'right') alignButtons[2].classList.add('active');
+                }
+                
+                // 设置行距
+                const lineHeightInput = propertyPanel.querySelectorAll('.property-group input[type="range"]')[0];
+                if (lineHeightInput) {
+                    const lineHeight = parseFloat(computedStyle.lineHeight) || 1.5;
+                    lineHeightInput.value = lineHeight;
+                }
+                
+                // 设置字间距
+                const letterSpacingInput = propertyPanel.querySelectorAll('.property-group input[type="range"]')[1];
+                if (letterSpacingInput) {
+                    const letterSpacing = parseInt(computedStyle.letterSpacing) || 0;
+                    letterSpacingInput.value = letterSpacing;
+                }
+            }
+        }
+
+        // 显示图片预览
+        function showImagePreview(imgSrc) {
+            const imageUploadArea = document.getElementById('imageUploadArea');
+            if (!imageUploadArea) return;
+            
+            imageUploadArea.classList.add('has-image');
+            imageUploadArea.innerHTML = `
+                <img src="${imgSrc}" alt="预览图片" class="image-preview" id="imagePreview">
+                <div class="image-actions">
+                    <button class="image-action-btn" onclick="triggerImageUpload()">更换图片</button>
+                    <button class="image-action-btn remove" onclick="removeImage()">删除图片</button>
+                </div>
+            `;
+        }
+
+        // 显示图片上传占位符
+        function showImageUploadPlaceholder() {
+            const imageUploadArea = document.getElementById('imageUploadArea');
+            if (!imageUploadArea) return;
+            
+            imageUploadArea.classList.remove('has-image');
+            imageUploadArea.innerHTML = `
+                <div class="image-upload-icon">📷</div>
+                <div class="image-upload-text">点击上传图片</div>
+                <div class="image-upload-hint">支持 JPG、PNG、GIF 格式</div>
+                <input type="file" id="imageFileInput" class="hidden-file-input" accept="image/*">
+            `;
+            
+            // 重新绑定点击事件
+            imageUploadArea.onclick = () => {
+                const fileInput = document.getElementById('imageFileInput');
+                if (fileInput) fileInput.click();
+            };
+            
+            // 绑定文件选择事件
+            const fileInput = document.getElementById('imageFileInput');
+            if (fileInput) {
+                fileInput.onchange = handleImageUpload;
+            }
+        }
+
+        // 触发图片上传
+        function triggerImageUpload() {
+            const fileInput = document.getElementById('imageFileInput');
+            if (fileInput) {
+                fileInput.click();
+            }
+        }
+
+        // 处理图片上传
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // 验证文件类型
+            if (!file.type.startsWith('image/')) {
+                alert('请选择图片文件');
+                return;
+            }
+            
+            // 创建FileReader读取图片
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imgSrc = e.target.result;
+                const currentElement = window.currentEditingElement;
+                
+                if (currentElement && currentElement.tagName === 'IMG') {
+                    // 创建临时图片对象获取原始尺寸
+                    const tempImg = new Image();
+                    tempImg.onload = function() {
+                        // 更新图片元素
+                        currentElement.src = imgSrc;
+                        currentElement.setAttribute('data-content', imgSrc);
+                        
+                        // 如果图片没有设置尺寸，使用原始尺寸
+                        if (!currentElement.style.width && !currentElement.width) {
+                            currentElement.style.width = tempImg.width + 'px';
+                            currentElement.style.height = tempImg.height + 'px';
+                            currentElement.width = tempImg.width;
+                            currentElement.height = tempImg.height;
+                            
+                            // 更新属性面板中的尺寸输入框
+                            const widthInput = document.getElementById('imageWidthInput');
+                            const heightInput = document.getElementById('imageHeightInput');
+                            if (widthInput) widthInput.value = tempImg.width;
+                            if (heightInput) heightInput.value = tempImg.height;
+                        }
+                        
+                        // 更新预览
+                        showImagePreview(imgSrc);
+                    };
+                    tempImg.src = imgSrc;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 删除图片
+        function removeImage() {
+            const currentElement = window.currentEditingElement;
+            if (currentElement && currentElement.tagName === 'IMG') {
+                // 恢复默认图片
+                currentElement.src = 'empty.png';
+                currentElement.setAttribute('data-content', 'empty.png');
+                
+                // 更新预览
+                showImageUploadPlaceholder();
+            }
+        }
+
+        // 绑定属性变化事件
+        function bindPropertyEvents(element) {
+            const propertyPanel = document.getElementById('propertyPanel');
+            if (!propertyPanel) return;
+            
+            const elementType = element.getAttribute('data-type') || 'text';
+            
+            // 内容编辑事件
+            if (elementType === 'text') {
+                // 文本内容变化
+                const contentTextInput = document.getElementById('contentTextInput');
+                if (contentTextInput) {
+                    contentTextInput.oninput = () => {
+                        const newText = contentTextInput.value;
+                        // 如果是要点，保留项目符号
+                        if (element.classList.contains('ppt-bullet')) {
+                            element.textContent = '• ' + newText;
+                        } else {
+                            element.textContent = newText;
+                        }
+                        element.setAttribute('data-content', newText);
+                    };
+                }
+            } else if (elementType === 'image') {
+                // 图片上传事件已在showImageUploadPlaceholder中绑定
+                const imageUploadArea = document.getElementById('imageUploadArea');
+                if (imageUploadArea && !imageUploadArea.classList.contains('has-image')) {
+                    imageUploadArea.onclick = () => {
+                        const fileInput = document.getElementById('imageFileInput');
+                        if (fileInput) fileInput.click();
+                    };
+                    
+                    const fileInput = document.getElementById('imageFileInput');
+                    if (fileInput) {
+                        fileInput.onchange = handleImageUpload;
+                    }
+                }
+                
+                // 图片尺寸调整事件
+                const widthInput = document.getElementById('imageWidthInput');
+                const heightInput = document.getElementById('imageHeightInput');
+                const lockAspectRatioBtn = document.getElementById('lockAspectRatio');
+                
+                let isAspectRatioLocked = true;
+                let aspectRatio = 1;
+                
+                // 计算初始宽高比
+                if (element.naturalWidth && element.naturalHeight) {
+                    aspectRatio = element.naturalWidth / element.naturalHeight;
+                } else if (element.width && element.height) {
+                    aspectRatio = element.width / element.height;
+                }
+                
+                // 锁定/解锁宽高比
+                if (lockAspectRatioBtn) {
+                    lockAspectRatioBtn.onclick = () => {
+                        isAspectRatioLocked = !isAspectRatioLocked;
+                        lockAspectRatioBtn.textContent = isAspectRatioLocked ? '🔒 锁定' : '🔓 解锁';
+                        lockAspectRatioBtn.style.color = isAspectRatioLocked ? '' : '#4a90e2';
+                    };
+                }
+                
+                // 宽度变化
+                if (widthInput) {
+                    widthInput.oninput = () => {
+                        const width = parseInt(widthInput.value) || 0;
+                        if (width > 0) {
+                            element.style.width = width + 'px';
+                            element.width = width;
+                            
+                            // 如果锁定宽高比，自动调整高度
+                            if (isAspectRatioLocked && aspectRatio > 0 && heightInput) {
+                                const newHeight = Math.round(width / aspectRatio);
+                                heightInput.value = newHeight;
+                                element.style.height = newHeight + 'px';
+                                element.height = newHeight;
+                            }
+                        }
+                    };
+                }
+                
+                // 高度变化
+                if (heightInput) {
+                    heightInput.oninput = () => {
+                        const height = parseInt(heightInput.value) || 0;
+                        if (height > 0) {
+                            element.style.height = height + 'px';
+                            element.height = height;
+                            
+                            // 如果锁定宽高比，自动调整宽度
+                            if (isAspectRatioLocked && aspectRatio > 0 && widthInput) {
+                                const newWidth = Math.round(height * aspectRatio);
+                                widthInput.value = newWidth;
+                                element.style.width = newWidth + 'px';
+                                element.width = newWidth;
+                            }
+                        }
+                    };
+                }
+            }
+            
+            // 文本样式属性（仅文本元素）
+            if (elementType === 'text') {
+                // 字体变化
+                const fontSelect = propertyPanel.querySelector('.property-group select');
+                if (fontSelect) {
+                    fontSelect.onchange = () => {
+                        element.style.fontFamily = fontSelect.value;
+                    };
+                }
+                
+                // 字号变化
+                const fontSizeInput = propertyPanel.querySelector('.property-group input[type="number"]');
+                if (fontSizeInput) {
+                    fontSizeInput.oninput = () => {
+                        element.style.fontSize = fontSizeInput.value + 'px';
+                    };
+                }
+                
+                // 颜色变化
+                const colorPicker = propertyPanel.querySelector('.color-picker');
+                if (colorPicker) {
+                    colorPicker.onclick = () => {
+                        // 简单的颜色选择（实际可以使用颜色选择器组件）
+                        const colors = ['#333', '#4a90e2', '#ff4757', '#ffa502', '#2ed573', '#5f27cd'];
+                        const currentColor = colorPicker.style.background || '#333';
+                        let currentIndex = -1;
+                        for (let i = 0; i < colors.length; i++) {
+                            if (colors[i] === currentColor || currentColor.includes(colors[i].substring(1))) {
+                                currentIndex = i;
+                                break;
+                            }
+                        }
+                        const nextIndex = (currentIndex + 1) % colors.length;
+                        colorPicker.style.background = colors[nextIndex];
+                        element.style.color = colors[nextIndex];
+                    };
+                }
+                
+                // 对齐变化
+                const alignButtons = propertyPanel.querySelectorAll('.align-btn');
+                alignButtons.forEach((btn, index) => {
+                    // 移除旧的事件监听器
+                    const newBtn = btn.cloneNode(true);
+                    btn.parentNode.replaceChild(newBtn, btn);
+                    
+                    newBtn.onclick = () => {
+                        alignButtons.forEach(b => b.classList.remove('active'));
+                        newBtn.classList.add('active');
+                        const aligns = ['left', 'center', 'right'];
+                        element.style.textAlign = aligns[index];
+                    };
+                });
+                
+                // 行距变化
+                const lineHeightInputs = propertyPanel.querySelectorAll('.property-group input[type="range"]');
+                if (lineHeightInputs.length > 0) {
+                    lineHeightInputs[0].oninput = () => {
+                        element.style.lineHeight = lineHeightInputs[0].value;
+                    };
+                }
+                
+                // 字间距变化
+                if (lineHeightInputs.length > 1) {
+                    lineHeightInputs[1].oninput = () => {
+                        element.style.letterSpacing = lineHeightInputs[1].value + 'px';
+                    };
+                }
+            }
+        }
+
+        // 添加到Chat
+        function addToChat(element) {
+            let content = '';
+            const elementType = element.getAttribute('data-type') || 'text';
+            
+            if (elementType === 'image') {
+                // 图片元素：添加图片引用
+                const imgSrc = element.src || element.getAttribute('data-content') || '';
+                content = `[图片] ${imgSrc}`;
+            } else {
+                // 文本元素：添加文本内容
+                content = element.getAttribute('data-content') || element.textContent.trim();
+            }
+            
+            const workspaceInput = document.querySelector('#workspace .chat-input');
+            
+            if (workspaceInput) {
+                // 如果输入框有内容，追加；否则直接填充
+                const currentValue = workspaceInput.value.trim();
+                if (currentValue) {
+                    workspaceInput.value = currentValue + '\n\n[圈选内容] ' + content;
+                } else {
+                    workspaceInput.value = '[圈选内容] ' + content;
+                }
+                
+                workspaceInput.focus();
+                
+                // 滚动到输入框
+                workspaceInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // 高亮输入框
+                workspaceInput.style.borderColor = '#4a90e2';
+                workspaceInput.style.boxShadow = '0 0 0 3px rgba(74, 144, 226, 0.2)';
+                setTimeout(() => {
+                    workspaceInput.style.borderColor = '';
+                    workspaceInput.style.boxShadow = '';
+                }, 2000);
+            }
+
+            // 取消选择
+            clearSelection();
+        }
+
+        // 删除元素
+        function deleteElement(element) {
+            if (confirm('确定要删除这个元素吗？')) {
+                element.remove();
+                selectedElements.delete(element);
+                
+                // 如果还有其他选中元素，更新工具栏
+                if (selectedElements.size > 0) {
+                    updateSelectionToolbar();
+                }
+            }
+        }
+
+        // togglePropertyPanel函数已在head中定义，这里不需要重复定义
+
+        // 初始化属性面板状态
+        document.addEventListener('DOMContentLoaded', function() {
+            const propertyPanel = document.getElementById('propertyPanel');
+            const expandBtn = document.getElementById('propertyPanelExpandBtn');
+            
+            if (propertyPanel) {
+                // 从localStorage读取状态
+                const savedState = localStorage.getItem('propertyPanelCollapsed');
+                if (savedState === 'true') {
+                    propertyPanel.classList.add('collapsed');
+                    if (expandBtn) expandBtn.style.display = 'flex';
+                } else {
+                    if (expandBtn) expandBtn.style.display = 'none';
+                }
+            }
+        });
+
+            // 监听编辑模式切换
+        document.addEventListener('DOMContentLoaded', function() {
+            const modeButtons = document.querySelectorAll('#workspace .mode-btn');
+            const workspace = document.getElementById('workspace');
+            
+            modeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    setTimeout(() => {
+                        if (this.textContent.trim() === '编辑模式') {
+                            workspace.classList.add('edit-mode-active');
+                            if (typeof window.initSelectionFeature === 'function') {
+                                window.initSelectionFeature();
+                            }
+                        } else {
+                            workspace.classList.remove('edit-mode-active');
+                            if (typeof clearSelection === 'function') {
+                                clearSelection();
+                            }
+                        }
+                    }, 100);
+                });
+            });
+
+            // 初始化圈选功能（如果默认是编辑模式）
+            setTimeout(() => {
+                const activeMode = document.querySelector('#workspace .mode-btn.active');
+                if (activeMode && activeMode.textContent.trim() === '编辑模式') {
+                    workspace.classList.add('edit-mode-active');
+                    if (typeof window.initSelectionFeature === 'function') {
+                        window.initSelectionFeature();
+                    }
+                }
+            }, 300);
+
+            // 支持回车键发送（首页）
+            const heroInput = document.getElementById('heroChatInput');
+            if (heroInput) {
+                heroInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        goToWorkspace();
+                    }
+                });
+            }
+
+            // 支持回车键发送（AI工作台）
+            const workspaceInput = document.querySelector('#workspace .chat-input');
+            if (workspaceInput) {
+                workspaceInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        const message = this.value.trim();
+                        if (message) {
+                            sendWorkspaceMessage(message);
+                        }
+                    }
+                });
+            }
+
+            // AI工作台发送按钮
+            const workspaceSendBtn = document.querySelector('#workspace .send-btn');
+            if (workspaceSendBtn) {
+                workspaceSendBtn.addEventListener('click', function() {
+                    const workspaceInput = document.querySelector('#workspace .chat-input');
+                    if (workspaceInput) {
+                        const message = workspaceInput.value.trim();
+                        if (message) {
+                            sendWorkspaceMessage(message);
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
